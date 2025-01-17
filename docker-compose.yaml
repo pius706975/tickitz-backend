@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:17.0-alpine3.19
+    container_name: wheelsrent_db
+    environment:
+      POSTGRES_PASSWORD: piuspius
+      POSTGRES_USER: pius
+      POSTGRES_DB: wheelsrent
+    ports:
+      - 5433:5432
+
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: wheelsrent/be:0.0.1
+    working_dir: /app
+    container_name: backend
+    volumes:
+      - ./:/app
+    ports:
+      - 5001:5000
+    depends_on:
+      - db
+
+  nginx:
+    restart: always
+    build:
+      context: ./nginx
+    ports:
+      - 80:80
