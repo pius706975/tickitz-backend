@@ -1,10 +1,7 @@
 import { User } from '@/interfaces/user.interfaces';
 import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 
-export type UserCreationAttributes = Optional<
-    User,
-    'id' | 'email' 
->;
+export type UserCreationAttributes = Optional<User, 'id' | 'email'>;
 
 export class UserModel
     extends Model<User, UserCreationAttributes>

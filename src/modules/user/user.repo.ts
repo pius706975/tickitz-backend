@@ -6,6 +6,10 @@ const userRepo = {
         return await DB.Users.findOne({ where: { email } });
     },
 
+    findUserById: async (userId: string): Promise<User | null> => {
+        return await DB.Users.findOne({ where: { id: userId } });
+    },
+
     getUserProfile: async (
         userId: string | undefined,
     ): Promise<User | null> => {
