@@ -18,6 +18,10 @@ module.exports = {
                 allowNull: false,
                 unique: true,
             },
+            phone_number: {
+                type: Sequelize.STRING,
+                allowNull: true,
+            },
             first_name: {
                 type: Sequelize.STRING,
                 allowNull: false,
@@ -29,6 +33,11 @@ module.exports = {
             image: {
                 type: Sequelize.STRING,
                 allowNull: true,
+            },
+            role: {
+                type: Sequelize.STRING,
+                allowNull: false,
+                defaultValue: 'user',
             },
             otp_code: {
                 type: Sequelize.STRING,

@@ -35,6 +35,7 @@ export const {
     FIREBASE_UNIVERSE_DOMAIN,
 } = process.env;
 
+// DB
 export const {
     DB_PORT,
     DB_USERNAME,
@@ -43,3 +44,7 @@ export const {
     DB_HOST,
     DB_DIALECT,
 } = process.env;
+
+// nodemailer
+export const { MAILER_EMAIL, MAILER_PASSWORD, MAILER_HOST, MAILER_PORT } =
+    process.env;

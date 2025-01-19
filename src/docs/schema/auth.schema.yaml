@@ -7,15 +7,31 @@ components:
                 - email
                 - password
             properties: 
-                name: 
+                first_name: 
                     type: string
-                    example: Full Name                    
+                    example: John
+                last_name: 
+                    type: string
+                    example: Doe                    
                 email:
                     type: string
                     example: email@example.com
                 password:
                     type: string
                     example: password
+
+        verify-account:
+            type: object
+            required:
+                - email
+                - otp_code
+            properties:
+                email:
+                    type: string
+                    example: email@example.com
+                otp_code:
+                    type: string
+                    example: 123456
 
         signin:
             type: object

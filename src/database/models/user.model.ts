@@ -11,6 +11,7 @@ export class UserModel
     implements User
 {
     public id!: string;
+    public firebase_id?: string;
     public email!: string;
     public first_name!: string;
     public last_name!: string;
@@ -33,6 +34,10 @@ export default function (sequelize: Sequelize): typeof UserModel {
                 type: DataTypes.UUIDV4,
                 defaultValue: DataTypes.UUIDV4,
             },
+            firebase_id: {
+                allowNull: true,
+                type: DataTypes.STRING,
+            },
             email: {
                 allowNull: false,
                 type: DataTypes.STRING,
@@ -45,11 +50,15 @@ export default function (sequelize: Sequelize): typeof UserModel {
             last_name: {
                 allowNull: true,
                 type: DataTypes.STRING,
-                unique: true,
             },
             image: {
                 allowNull: true,
                 type: DataTypes.STRING,
+            },
+            role: {
+                allowNull: true,
+                type: DataTypes.STRING,
+                defaultValue: 'user',
             },
             otp_code: {
                 allowNull: true,

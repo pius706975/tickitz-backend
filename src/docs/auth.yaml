@@ -21,6 +21,27 @@
             500:
                 description: 'Internal server error'
 
+# [PUT] Verify OTP
+/auth/verify-account:
+    put: 
+        tags: 
+            - Auth
+        summary: Verify Email
+        requestBody:
+            description: Verify email with OTP code
+            required: true
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/verify-account'
+        responses: 
+            200:
+                description: 'OK'
+            404:
+                descriptiom: 'User not found'
+            500: 
+                description: 'Internal server error'
+
 # [POST] signin
 /auth/signin:
     post:

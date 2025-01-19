@@ -1,4 +1,4 @@
-export class CustomError extends Error {
+class CustomError extends Error {
     public statusCode: number;
 
     constructor(message: string, statusCode: number) {
@@ -7,3 +7,5 @@ export class CustomError extends Error {
         Error.captureStackTrace(this, this.constructor);
     }
 }
+
+export default CustomError;

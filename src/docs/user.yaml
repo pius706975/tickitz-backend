@@ -14,6 +14,27 @@
         security:
             - bearerAuth: []
 
+# [PUT] Send OTP
+/user/send-otp:
+    put:
+        tags: 
+            - User
+        summary: Send OTP
+        requestBody:
+            description: Send OTP to user email
+            required: true
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/send-otp'
+        responses: 
+            200:
+                description: 'OK'
+            404:
+                descriptiom: 'User not found'
+            500: 
+                description: 'Internal server error'
+
 securityDefinitions:
     bearerAuth:
         type: apiKey

@@ -1,23 +1,49 @@
 import { NextFunction, Request, Response } from 'express';
-import { getUserProfileService } from './user.service';
+import userService from './user.service';
 
-export const getUserProfileController = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-): Promise<void> => {
-    try {
-        const authorization = req.headers.authorization;
-        if (!authorization) {
-            res.status(404).json({ message: 'User not found' });
-            return;
+const userController = {
+    sendOTP: async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> => {
+        try {
+            const { email } = req.body;
+
+            await userService.sendOTP(email);
+
+            res.status(200).json({
+                message: 'OTP sent successfully',
+            });
+        } catch (error: any) {
+            console.log(error.error);
+            next(error);
         }
+    },
 
-        const accessToken = authorization.split(' ')[1];
-        const response = await getUserProfileService(accessToken);
+    getUserProfile: async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> => {
+        try {
+            const authorization = req.headers.authorization;
+            if (!authorization) {
+                res.status(404).json({ message: 'User not found' });
+                return;
+            }
 
-        res.status(200).json({ message: 'User data fetched', data: response });
-    } catch (error) {
-        next(error);
-    }
+            const accessToken = authorization.split(' ')[1];
+            const response = await userService.getUserProfile(accessToken);
+
+            res.status(200).json({
+                message: 'User data fetched',
+                data: response,
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 };
+
+export default userController;
