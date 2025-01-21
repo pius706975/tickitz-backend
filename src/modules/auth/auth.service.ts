@@ -82,6 +82,7 @@ const authService = {
         const verifiedUser = await userRepo.updateUser(user.id, {
             ...user,
             is_verified: true,
+            otp_code: '',
         });
 
         return verifiedUser;
