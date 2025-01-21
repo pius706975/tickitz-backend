@@ -70,3 +70,4 @@ export const validateVerifyAccount = (userData: any) => {
 
     return schema.validate(userData, options);
 }
+

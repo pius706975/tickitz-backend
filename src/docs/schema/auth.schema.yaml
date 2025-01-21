@@ -45,3 +45,25 @@ components:
                 password:
                     type: string
                     example: password
+
+        newrefreshtoken:
+            type: object
+            required:
+                - user_id
+                - refresh_token
+            properties:
+                user_id:
+                    type: string
+                    example: user id
+                refresh_token:
+                    type: string
+                    example: Bearer token
+
+        signout:
+            type: object
+            required:
+                - refresh_token
+            properties:
+                refresh_token:
+                    type: string
+                    example: user id

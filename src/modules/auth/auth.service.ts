@@ -1,11 +1,16 @@
 import { User } from '@/interfaces/user.interfaces';
-import { validateSignIn, validateSignUp, validateVerifyAccount } from './auth.validator';
-import { generateJWT } from '@/middlewares/jwt.service';
-import { JWT_ACCESS_TOKEN_SECRET } from '@/config';
+import {
+    validateSignIn,
+    validateSignUp,
+    validateVerifyAccount,
+} from './auth.validator';
+import { generateJWT, verifyJWT } from '@/middlewares/jwt.service';
+import { JWT_ACCESS_TOKEN_SECRET, JWT_REFRESH_TOKEN_SECRET } from '@/config';
 import CustomError from '@/utils/custom-error';
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
+    signOut,
 } from 'firebase/auth';
 import auth from '@/config/firebase.config';
 import generateOTP from '@/utils/generate-otp';
@@ -67,14 +72,17 @@ const authService = {
         if (user.otp_code !== userData.otp_code)
             throw new CustomError('Invalid OTP code', 400);
 
-        const otpExpirationDate = user.otp_expiration ? new Date(user.otp_expiration) : null;
+        const otpExpirationDate = user.otp_expiration
+            ? new Date(user.otp_expiration)
+            : null;
         const otpExpired = otpExpirationDate && otpExpirationDate < new Date();
-        
+
         if (otpExpired) throw new CustomError('OTP code has expired', 400);
 
         const verifiedUser = await userRepo.updateUser(user.id, {
             ...user,
             is_verified: true,
+            otp_code: '',
         });
 
         return verifiedUser;
@@ -106,9 +114,72 @@ const authService = {
         const accessToken = await generateJWT(
             payload,
             JWT_ACCESS_TOKEN_SECRET as string,
+            '5m',
         );
 
-        return { user, accessToken };
+        const refreshToken = await generateJWT(
+            payload,
+            JWT_REFRESH_TOKEN_SECRET as string,
+            '7d',
+        );
+
+        const refreshTokenExpiredAt = new Date(
+            Date.now() + 7 * 24 * 60 * 60 * 1000,
+        );
+
+        await authRepo.createRefreshToken(
+            user.id!,
+            refreshToken,
+            refreshTokenExpiredAt.toISOString(),
+        );
+
+        return { user, accessToken, refreshToken };
+    },
+
+    refreshToken: async (userId: string, refreshToken: string) => {
+        const user = await userRepo.findUserById(userId);
+        if (!user) throw new CustomError('User not found', 404);
+
+        const getRefreshToken = await authRepo.getRefreshToken(user.id!);
+        if (!getRefreshToken || getRefreshToken.token !== refreshToken)
+            throw new CustomError('Invalid refresh token', 401);
+
+        const expiredAt = new Date(getRefreshToken.expires_at);
+        if (expiredAt < new Date())
+            throw new CustomError('Refresh token has expired', 401);
+
+        const payload = {
+            userId: user.id,
+        };
+
+        const newAccessToken = await generateJWT(
+            payload,
+            JWT_ACCESS_TOKEN_SECRET as string,
+            '5m',
+        );
+
+        return { accessToken: newAccessToken };
+    },
+
+    signOut: async (accessToken: string, refreshToken: string) => {
+        const decodeToken = await verifyJWT(
+            accessToken,
+            JWT_ACCESS_TOKEN_SECRET as string,
+        );
+
+        const userId = decodeToken.userId;
+
+        const user = await userRepo.findUserById(userId);
+        if (!user) throw new CustomError('User not found', 404);
+
+        const deleteRefreshToken = await authRepo.deleteRefreshToken(
+            user.id!,
+            refreshToken,
+        );
+        if (!deleteRefreshToken)
+            throw new CustomError('Refresh token not found', 404);
+
+        return deleteRefreshToken;
     },
 };
 
